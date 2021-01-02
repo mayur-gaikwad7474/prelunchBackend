@@ -3,7 +3,7 @@ const router = express.Router()
 const Email = require('../Schema/Emaillist')
 const Premium = require('../Schema/Premium')
 
-router.post('/email', async (req, res) => {
+router.post('/email/premium', async (req, res) => {
     try {
         await Email.create(req.body)
         if (req.body.ref !== "") {
@@ -34,6 +34,26 @@ router.post('/email', async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             error: "email all ready exists"
+        })
+    }
+})
+
+router.post('/email', async (req, res) => {
+    try {
+        const userExist = await Email.findOne({ email: req.body.email })
+        if (userExist === null) {
+            await Email.create(req.body)
+            return res.status(200).json({
+                message: "user added"
+            })
+        } else {
+            return res.status(409).json({
+                message: "user exists"
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            error: "something went wrong"
         })
     }
 })
